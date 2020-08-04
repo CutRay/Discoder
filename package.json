@@ -1,0 +1,24 @@
+{
+  "name": "code-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "App.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "CutRay",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.3.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-vue": "^2.0.2",
+    "eslint-plugin-prettier": "^3.1.4"
+  }
+}
