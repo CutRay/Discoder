@@ -1,18 +1,18 @@
-const Discord = require('discord.js')
-const axios = require('axios')
 require('dotenv').config()
-const client = new Discord.Client()
 const token = process.env.TOKEN
-const waitUsers = []
+const Discord = require('discord.js')
+const client = new Discord.Client()
+const waitUsers =require('./WaitUsers')
+const sourceCode = require('./SourceCode')
 
 client.on('ready', () => {
   console.log('ready...')
 })
 
 client.on('message', (message) => {
-  if (message.author.bot) {
+  if (message.author.bot) 
     return
-  }
+    
   const id = message.author.id
   const userName = message.author.username
 
@@ -24,28 +24,25 @@ client.on('message', (message) => {
   }
 
   if (message.content === '!coder --reset') {
-    deleteUser(id)
+    waitUsers.deleteUser(id)
     return
   }
 
-  if (
-    message.content === '!coder --hub' &&
-    !waitUsers.some((el) => el.id === id)
-  ) {
+  if (message.content === '!coder --hub' && !waitUsers.hasUser(id)) {
     console.log('standby: ' + userName + '(id:' + id + ')')
-    waitUsers.push({ id: id, useGitHub: true })
+    waitUsers.addUser({ id: id, useGitHub: true })
     message.reply('プログラミング言語の種類を送ってー')
     return
   }
 
-  if (message.content === '!coder' && !waitUsers.some((el) => el.id === id)) {
+  if (message.content === '!coder' && !waitUsers.hasUser(id)) {
     console.log('standby: ' + userName + '(id:' + id + ')')
-    waitUsers.push({ id: id })
+    waitUsers.addUser({ id: id })
     message.reply('プログラミング言語の種類を送ってー')
     return
   }
 
-  const userData = getUser(id)
+  const userData = waitUsers.getUser(id)
   if (!userData) return
 
   if (!userData['lang']) {
@@ -70,14 +67,14 @@ client.on('message', (message) => {
     message.reply('OKじっこーするよ\nちょっと待ってね！！')
     userData.input = message.content
 
-    postCode(userData)
+    sourceCode.postCode(userData)
       .then((msg) => {
         console.log(msg.data)
         if (msg.data.error) {
           throw { id, userName, msg: msg.data.error }
         }
         setTimeout(function () {
-          getResult(msg.data.id)
+          sourceCode.getResult(msg.data.id)
             .then((res) => {
               if (msg.data.error) {
                 throw { id, userName, msg: msg.data.error }
@@ -103,37 +100,8 @@ client.on('message', (message) => {
         console.log(error.userName + '(id:' + error.id + ')')
         console.log(error.msg)
       })
-    deleteUser(id)
+    waitUsers.deleteUser(id)
     return
   }
 })
 client.login(token)
-
-function getUser(id) {
-  return waitUsers.find((el) => el.id === id)
-}
-
-function deleteUser(id) {
-  const delUserIndex = waitUsers.findIndex((el) => el.id === id)
-  waitUsers.splice(delUserIndex, 1)
-}
-
-async function postCode(data) {
-  const url = 'http://api.paiza.io:80/runners/create'
-  return await axios.post(url, {
-    source_code: data.code,
-    language: data.lang,
-    input: data.input,
-    api_key: 'guest',
-  })
-}
-
-async function getResult(id) {
-  const url = 'http://api.paiza.io:80/runners/get_details'
-  return await axios.get(url, {
-    params: {
-      id: id,
-      api_key: 'guest',
-    },
-  })
-}

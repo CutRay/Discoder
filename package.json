@@ -11,12 +11,12 @@
   "dependencies": {
     "axios": "^0.19.2",
     "discord.js": "^12.2.0",
-    "dotenv": "^8.2.0",
-    "prettier": "^2.0.5",
-    "xmlhttprequest": "^1.8.0"
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^10.1.0",
+    "babel-preset-env": "^1.7.0",
     "eslint": "^7.3.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4"
