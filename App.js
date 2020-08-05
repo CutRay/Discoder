@@ -3,83 +3,120 @@ const axios = require('axios')
 require('dotenv').config()
 const client = new Discord.Client()
 const token = process.env.TOKEN
-const waitCodeUsers = []
+const waitUsers = []
 
 client.on('ready', () => {
   console.log('ready...')
 })
 
-client.on('message', message => {
+client.on('message', (message) => {
   if (message.author.bot) {
     return
   }
-  const authorId = message.author.id
+  const id = message.author.id
+  const userName = message.author.username
+
+  if (message.content === '!coder --help') {
+    message.reply(
+      '以下のプログラミング言語を使用できます。\n長すぎるとバグります。\n--reset:最初からやり直します．\n--hub:githubからコードを取得します。'
+    )
+    return
+  }
+
+  if (message.content === '!coder --reset') {
+    deleteUser(id)
+    return
+  }
+
   if (
-    message.content === '!coder' &&
-    !waitCodeUsers.some(el => el.id === authorId)
+    message.content === '!coder --hub' &&
+    !waitUsers.some((el) => el.id === id)
   ) {
-    console.log('standby:' + authorId)
-    waitCodeUsers.push({ id: authorId })
+    console.log('standby: ' + userName + '(id:' + id + ')')
+    waitUsers.push({ id: id, useGitHub: true })
     message.reply('プログラミング言語の種類を送ってー')
     return
   }
 
-  const userData = waitCodeUsers.find(el => el.id === authorId)
+  if (message.content === '!coder' && !waitUsers.some((el) => el.id === id)) {
+    console.log('standby: ' + userName + '(id:' + id + ')')
+    waitUsers.push({ id: id })
+    message.reply('プログラミング言語の種類を送ってー')
+    return
+  }
+
+  const userData = getUser(id)
   if (!userData) return
-  if (message.content === '!coder --help') {
+
+  if (!userData['lang']) {
+    console.log('get lang: ' + userName + '(id:' + id + ')')
+    userData.lang = message.content
     message.reply(
-      '以下のプログラミング言語を使用できます。\n長すぎるとバグります。'
+      '言語はOK\n次はコードを送ってー(GitHubを利用する場合はURL貼ってね！！)'
     )
     return
   }
-  if (message.content === '!coder --reset') {
-    delUserIndex = waitCodeUsers.findIndex(el => el.id === authorId)
-    waitCodeUsers.splice(delUserIndex, 1)
-    return
-  }
-  if (!userData['lang']) {
-    console.log('get lang:' + authorId)
-    userData.lang = message.content
-    message.reply('言語はOK\n次はコードを送ってー')
-    return
-  }
+
   if (!userData['code']) {
-    console.log('get code:' + authorId)
-    userData.code = message.content
+    console.log('get code: ' + userName + '(id:' + id + ')')
+    if (userData.useGitHub) console.log()
+    else userData.code = message.content
     message.reply('コードOK\n次は入力を送ってー')
     return
   }
+
   if (!userData['input']) {
-    console.log('get inputs:' + authorId)
+    console.log('get inputs: ' + userName + '(id:' + id + ')')
     message.reply('OKじっこーするよ\nちょっと待ってね！！')
     userData.input = message.content
 
     postCode(userData)
-      .then(msg => {
-        setTimeout(function() {
+      .then((msg) => {
+        console.log(msg.data)
+        if (msg.data.error) {
+          throw { id, userName, msg: msg.data.error }
+        }
+        setTimeout(function () {
           getResult(msg.data.id)
-            .then(res => {
-              message.reply(res.data.stdout)
-              console.log('complate' + authorId)
+            .then((res) => {
+              if (msg.data.error) {
+                throw { id, userName, msg: msg.data.error }
+              }
+              if (res.data.status === 'running')
+                throw { id, userName, msg: 'タイムアウト' }
+              else if (res.data.exit_code === 1)
+                throw { id, userName, msg: res.data.stderr }
+              else {
+                message.reply(res.data.stdout)
+                console.log('complate ' + userName + '(id:' + id + ')')
+              }
             })
-            .catch(error => {
-              console.log('get result error' + authorId)
-              console.log(error)
+            .catch((error) => {
+              message.reply(error.msg)
+              console.log(error.userName + '(id:' + error.id + ')')
+              console.log(error.msg)
             })
         }, 1000)
       })
-      .catch(error => {
-        console.log('post code error')
-        console.log(error)
+      .catch((error) => {
+        message.reply(error.msg)
+        console.log(error.userName + '(id:' + error.id + ')')
+        console.log(error.msg)
       })
-
-    delUserIndex = waitCodeUsers.findIndex(el => el.id === authorId)
-    waitCodeUsers.splice(delUserIndex, 1)
-
+    deleteUser(id)
     return
   }
 })
 client.login(token)
+
+function getUser(id) {
+  return waitUsers.find((el) => el.id === id)
+}
+
+function deleteUser(id) {
+  const delUserIndex = waitUsers.findIndex((el) => el.id === id)
+  waitUsers.splice(delUserIndex, 1)
+}
 
 async function postCode(data) {
   const url = 'http://api.paiza.io:80/runners/create'
@@ -87,7 +124,7 @@ async function postCode(data) {
     source_code: data.code,
     language: data.lang,
     input: data.input,
-    api_key: 'guest'
+    api_key: 'guest',
   })
 }
 
@@ -96,7 +133,7 @@ async function getResult(id) {
   return await axios.get(url, {
     params: {
       id: id,
-      api_key: 'guest'
-    }
+      api_key: 'guest',
+    },
   })
 }
