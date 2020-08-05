@@ -3,7 +3,7 @@ const token = process.env.TOKEN
 const Discord = require('discord.js')
 const client = new Discord.Client()
 const waitUsers =require('./WaitUsers')
-const sourceCode = require('./SourceCode')
+const paiza = require('./Paiza')
 
 client.on('ready', () => {
   console.log('ready...')
@@ -12,7 +12,7 @@ client.on('ready', () => {
 client.on('message', (message) => {
   if (message.author.bot) 
     return
-    
+
   const id = message.author.id
   const userName = message.author.username
 
@@ -67,14 +67,14 @@ client.on('message', (message) => {
     message.reply('OKじっこーするよ\nちょっと待ってね！！')
     userData.input = message.content
 
-    sourceCode.postCode(userData)
+    paiza.postCode(userData)
       .then((msg) => {
         console.log(msg.data)
         if (msg.data.error) {
           throw { id, userName, msg: msg.data.error }
         }
         setTimeout(function () {
-          sourceCode.getResult(msg.data.id)
+          paiza.getResult(msg.data.id)
             .then((res) => {
               if (msg.data.error) {
                 throw { id, userName, msg: msg.data.error }
