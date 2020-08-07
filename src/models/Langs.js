@@ -1,4 +1,4 @@
-const langs = require('./langs.json').langs
+const langs = require('../db/langs.json').langs
 module.exports = {
   hasLang(ops) {
     return langs.some((el) => el.ops === ops)

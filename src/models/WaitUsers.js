@@ -1,7 +1,7 @@
 const waitUsers = []
 module.exports = {
   addUser: function (user) {
-    waitUsers.push(user)
+    waitUsers.push({ ...user, phase: 'code' })
   },
   hasUser(id) {
     return waitUsers.some((el) => el.id === id)
@@ -18,9 +18,17 @@ module.exports = {
     console.log(waitUsers)
   },
   setCode: function (id, code) {
-    this.getUser(id).code = code
+    const user = this.getUser(id)
+    user.code = code
+    user.phase = 'input'
   },
   setInput: function (id, input) {
-    this.getUser(id).input = input
+    const user = this.getUser(id)
+    user.input = input
+    user.phase = 'exec'
+  },
+  getUserPhase: function (id) {
+    const user = this.getUser(id)
+    return user ? user.phase : -1
   },
 }
