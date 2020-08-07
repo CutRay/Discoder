@@ -1,0 +1,32 @@
+{
+  "langs": [
+    { "name": "Java", "ops": "java" },
+    { "name": "Ruby", "ops": "ruby" },
+    { "name": "Python", "ops": "python" },
+    { "name": "Python3", "ops": "python3" },
+    { "name": "PHP", "ops": "php" },
+    { "name": "Perl", "ops": "perl" },
+    { "name": "C", "ops": "c" },
+    { "name": "C++", "ops": "cpp" },
+    { "name": "C#", "ops": "csharp" },
+    { "name": "JavaScript", "ops": "javascript" },
+    { "name": "Objective-C", "ops": "object-c" },
+    { "name": "Kotlin", "ops": "kotlin" },
+    { "name": "Scala", "ops": "scala" },
+    { "name": "Swift", "ops": "swift" },
+    { "name": "Go", "ops": "go" },
+    { "name": "Haskell", "ops": "haskell" },
+    { "name": "CoffeScript", "ops": "coffescript" },
+    { "name": "Bash", "ops": "bash" },
+    { "name": "Erlang", "ops": "erlang" },
+    { "name": "R", "ops": "r" },
+    { "name": "COBOL", "ops": "cobol" },
+    { "name": "VB", "ops": "vb" },
+    { "name": "F#", "ops": "fsharp" },
+    { "name": "D", "ops": "d" },
+    { "name": "Clojure", "ops": "clojure" },
+    { "name": "Ellxlr", "ops": "elixir" },
+    { "name": "Rust", "ops": "rust" },
+    { "name": "Scheme", "ops": "scheme" }
+  ]
+}

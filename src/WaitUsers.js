@@ -13,4 +13,14 @@ module.exports = {
     const delUserIndex = waitUsers.findIndex((el) => el.id === id)
     waitUsers.splice(delUserIndex, 1)
   },
+  showAllUsers: function () {
+    console.log('waitUsers >')
+    console.log(waitUsers)
+  },
+  setCode: function (id, code) {
+    this.getUser(id).code = code
+  },
+  setInput: function (id, input) {
+    this.getUser(id).input = input
+  },
 }
