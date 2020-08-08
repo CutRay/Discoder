@@ -14,7 +14,6 @@ module.exports = function ({ id, name }, message) {
   }
   if (msgContent[2] && msgContent[2] === '--hub') {
     waitUsers.addUser({ ...{ id, name, useGitHub: true }, lang })
-    return
   } else {
     waitUsers.addUser({ ...{ id, name }, lang })
   }

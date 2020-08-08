@@ -6,9 +6,13 @@ module.exports = function (message) {
   const input = message.content
   const userData = waitUsers.getUser(id)
 
+  console.log('input phase: ' + userData.name + '(id:' + userData.id + ')')
   waitUsers.setInput(userData.id, input)
-  console.log('get inputs: ' + userData.name + '(id:' + userData.id + ')')
+  console.log(
+    'complate input phase: ' + userData.name + '(id:' + userData.id + ')'
+  )
   message.reply('OKじっこーするよ\nちょっと待ってね！！')
+  console.log(userData)
   execCode(userData, message)
   waitUsers.deleteUser(userData.id)
   waitUsers.showAllUsers()
@@ -19,7 +23,7 @@ function execCode(userData, message) {
   paiza
     .postCode(userData)
     .then((msg) => {
-      if (msg.data.error) throw { userData, msg: msg.data.error }
+      if (msg.data.error) throw { ...userData, msg: msg.data.error }
 
       setTimeout(function () {
         paiza
@@ -35,7 +39,11 @@ function execCode(userData, message) {
             else {
               message.reply('\n' + res.data.stdout)
               console.log(
-                'complate: ' + userData.name + '(id:' + userData.id + ')'
+                'complate exec phase: ' +
+                  userData.name +
+                  '(id:' +
+                  userData.id +
+                  ')'
               )
             }
           })
@@ -49,6 +57,6 @@ function execCode(userData, message) {
     .catch((error) => {
       message.reply('\n' + error.msg)
       console.log('post error: ' + error.name + '(id:' + error.id + ')')
-      console.log(error.msg)
+      console.log(error)
     })
 }
